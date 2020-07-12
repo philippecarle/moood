@@ -1,0 +1,47 @@
+version: '3'
+
+services: 
+  api:
+    image: golang:1.14
+    volumes: 
+      - ./src/api:/go/src/github.com/philippecarle/mood/api
+    ports:
+      - "8080:8080"
+    links: 
+      - rabbitmq
+      - mongo
+    working_dir: /go/src/github.com/philippecarle/mood/api
+    command: go run cmd/server.go
+    environment:
+      MONGO_USERNAME: root
+      MONGO_PASSWORD: root
+
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - ./data/mongo:/data/db
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+
+  rabbitmq:
+    image: rabbitmq:management-alpine
+    restart: always
+    hostname: rabbit
+    volumes:
+      - ./config/rabbitmq/rabbitmq.config:/etc/rabbitmq/rabbitmq.config
+      - ./config/rabbitmq/definitions.json:/etc/rabbitmq/definitions.json
+      - ./data/rabbitmq:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  spacy:
+    build: src/worker/spacy
+    depends_on: 
+      - rabbitmq
+    links: 
+      - rabbitmq

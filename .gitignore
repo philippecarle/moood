@@ -1,0 +1,6 @@
+src/worker/spacy/.idea
+src/worker/spacy/venv
+data/mongo/*
+!data/mongo/.gitkeep
+data/rabbitmq/*
+!data/rabbitmq/.gitkeep
