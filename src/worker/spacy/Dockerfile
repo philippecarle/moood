@@ -1,7 +1,8 @@
 FROM python:3.8-slim-buster
 
-ADD . /app
-WORKDIR /app
+WORKDIR /usr/src/app
+
+COPY requirements.txt .
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -12,5 +13,3 @@ RUN python -m venv /venv
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN python -m spacy download en_core_web_sm
-
-CMD ["python", "main.py"]

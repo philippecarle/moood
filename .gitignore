@@ -4,3 +4,5 @@ data/mongo/*
 !data/mongo/.gitkeep
 data/rabbitmq/*
 !data/rabbitmq/.gitkeep
+src/api/tmp/*
+src/api/.devcontainer/*

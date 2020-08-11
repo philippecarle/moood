@@ -1,8 +1,10 @@
-version: '3'
+version: '3.4'
 
 services: 
   api:
-    image: golang:1.14
+    build: 
+      context: src/api
+      target: dev
     volumes: 
       - ./src/api:/go/src/github.com/philippecarle/mood/api
     ports:
@@ -11,7 +13,6 @@ services:
       - rabbitmq
       - mongo
     working_dir: /go/src/github.com/philippecarle/mood/api
-    command: go run cmd/server.go
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: root
@@ -38,10 +39,19 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      interval: 5s
+      timeout: 15s
+      retries: 1
 
   spacy:
     build: src/worker/spacy
+    restart: on-failure
     depends_on: 
       - rabbitmq
     links: 
       - rabbitmq
+    volumes: 
+      - ./src/worker/spacy:/usr/src/app
+    entrypoint: ["python", "main.py"]

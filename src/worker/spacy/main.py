@@ -5,7 +5,7 @@ from consumer.callback import on_message
 
 connection = connection()
 channel = connection.channel()
-channel.basic_consume('spacy', on_message)
+channel.basic_consume('entries', on_message)
 
 try:
     channel.start_consuming()

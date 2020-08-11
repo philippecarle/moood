@@ -40,7 +40,16 @@
     "policies": [],
     "queues": [
         {
-            "name": "spacy",
+            "name": "entries",
+            "vhost": "/",
+            "durable": true,
+            "auto_delete": false,
+            "arguments": {
+                "x-queue-type": "classic"
+            }
+        },
+        {
+            "name": "processed",
             "vhost": "/",
             "durable": true,
             "auto_delete": false,

@@ -1,25 +1,25 @@
 import json
 
-import pika
+import pika.channel
 import spacy
 from vaderSentiment import vaderSentiment
 
 
-def on_message(channel: pika.spec.Channel,
+def on_message(channel: pika.channel.Channel,
                method: pika.spec.Basic.Deliver,
                properties: pika.spec.BasicProperties,
                body: bytes):
     nlp = spacy.load("en_core_web_sm")
-    doc = nlp(body.decode("utf-8"))
+    entry = json.loads(body.decode("utf-8"))
+    doc = nlp(entry['content'])
     sentences = [str(s) for s in doc.sents]
     analyzer = vaderSentiment.SentimentIntensityAnalyzer()
-    data = {'sentences': []}
+    entry['sentences'] = []
     for s in sentences:
-        sentence = str(s)
-        data['sentences'].append({
-            'sentence': sentence,
-            'score': analyzer.polarity_scores(sentence)
+        entry['sentences'].append({
+            'sentence': s,
+            'score': analyzer.polarity_scores(s)
         })
-        sentence = nlp(body.decode("utf-8"))
 
-    print(json.dumps(data))
+    channel.basic_publish('', 'processed', bytearray(json.dumps(entry), encoding='utf8'))
+    print("Processed entry " + entry['id'])
