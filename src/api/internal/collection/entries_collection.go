@@ -15,9 +15,9 @@ type EntriesCollection struct {
 	collection *mongo.Collection
 }
 
-// NewEntriesCollection creates an EntriesRepository
-func NewEntriesCollection(c *mongo.Collection) EntriesCollection {
-	return EntriesCollection{collection: c}
+// NewEntriesCollection creates an EntriesCollection
+func NewEntriesCollection(c *mongo.Database) EntriesCollection {
+	return EntriesCollection{collection: c.Collection("entries")}
 }
 
 // Insert a new Entry in the database

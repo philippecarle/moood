@@ -16,6 +16,7 @@ services:
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: root
+      JWT_PRIVATE_KEY: CH4NGEM3
 
   mongo:
     image: mongo

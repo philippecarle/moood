@@ -34,15 +34,15 @@ func Setup() *gin.Engine {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	db.Client().Connect(ctx)
 	defer cancel()
-	er := collection.NewEntriesCollection(db.Collection("entries"))
 
 	conn := bus.Connection{}
 	conn.Init()
-	h := handlers.NewEntriesHandler(&conn, er)
+	e := handlers.NewEntriesHandler(&conn, collection.NewEntriesCollection(db))
+	u := handlers.NewUserHandler(collection.NewUsersCollection(db))
 
-	r.POST("/register", handlers.NotImplemented)
-	r.POST("/login", handlers.NotImplemented)
-	r.POST("/entries", h.PostEntry)
+	r.POST("/register", u.Register)
+	r.POST("/login", u.Login)
+	r.POST("/entries", e.PostEntry)
 	r.GET("/entries", handlers.NotImplemented)
 
 	return r
