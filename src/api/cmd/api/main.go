@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"context"
@@ -16,18 +16,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Server will run the gin server
-func Server() *gin.Engine {
+func main() {
 	r := gin.Default()
-
 	r.Use(cors.Default())
 
-	cred := options.Credential{
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://mongo:27017").SetAuth(options.Credential{
 		Username: os.Getenv("MONGO_USERNAME"),
 		Password: os.Getenv("MONGO_PASSWORD"),
-	}
-
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://mongo:27017").SetAuth(cred))
+	}))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -57,5 +53,5 @@ func Server() *gin.Engine {
 		auth.GET("/entries", handlers.NotImplemented)
 	}
 
-	return r
+	r.Run()
 }
