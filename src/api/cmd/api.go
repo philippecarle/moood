@@ -8,16 +8,18 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/philippecarle/mood/api/internal/bus"
-	"github.com/philippecarle/mood/api/internal/collection"
-	"github.com/philippecarle/mood/api/internal/handlers"
+	"github.com/philippecarle/moood/api/internal/bus"
+	"github.com/philippecarle/moood/api/internal/collection"
+	"github.com/philippecarle/moood/api/internal/handlers"
+	"github.com/philippecarle/moood/api/internal/middlewares"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Setup will run the gin server
-func Setup() *gin.Engine {
+// Server will run the gin server
+func Server() *gin.Engine {
 	r := gin.Default()
+
 	r.Use(cors.Default())
 
 	cred := options.Credential{
@@ -37,13 +39,23 @@ func Setup() *gin.Engine {
 
 	conn := bus.Connection{}
 	conn.Init()
+	uc := collection.NewUsersCollection(db)
 	e := handlers.NewEntriesHandler(&conn, collection.NewEntriesCollection(db))
-	u := handlers.NewUserHandler(collection.NewUsersCollection(db))
+	u := handlers.NewUserHandler(uc)
+	f := middlewares.JWTMiddleWareFactory{UsersCollection: uc}
+
+	authMiddleware := f.NewJWTMiddleWare()
 
 	r.POST("/register", u.Register)
-	r.POST("/login", u.Login)
-	r.POST("/entries", e.PostEntry)
-	r.GET("/entries", handlers.NotImplemented)
+	r.POST("/login", authMiddleware.LoginHandler)
+	r.GET("/refresh", authMiddleware.RefreshHandler)
+
+	auth := r.Group("")
+	auth.Use(authMiddleware.MiddlewareFunc())
+	{
+		auth.POST("/entries", e.PostEntry)
+		auth.GET("/entries", handlers.NotImplemented)
+	}
 
 	return r
 }

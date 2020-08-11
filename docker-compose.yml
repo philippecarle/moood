@@ -6,13 +6,13 @@ services:
       context: src/api
       target: dev
     volumes: 
-      - ./src/api:/go/src/github.com/philippecarle/mood/api
+      - ./src/api:/go/src/github.com/philippecarle/moood/api
     ports:
       - "8080:8080"
     links: 
       - rabbitmq
       - mongo
-    working_dir: /go/src/github.com/philippecarle/mood/api
+    working_dir: /go/src/github.com/philippecarle/moood/api
     environment:
       MONGO_USERNAME: root
       MONGO_PASSWORD: root

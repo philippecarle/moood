@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/philippecarle/mood/api/cmd"
+	"github.com/philippecarle/moood/api/cmd"
 )
 
 func main() {
-	cmd.Setup().Run()
+	cmd.Server().Run()
 }

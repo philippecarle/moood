@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/philippecarle/mood/api/internal/models"
+	"github.com/philippecarle/moood/api/internal/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"

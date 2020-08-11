@@ -27,9 +27,9 @@ CMD air
 FROM base AS builder
 ENV GIN_MODE=release
 ENV PORT=80
-COPY . /go/src/github.com/philippecarle/mood/api
-WORKDIR /go/src/github.com/philippecarle/mood/api
-RUN go build -tags=jsoniter -o /go/bin/mood
+COPY . /go/src/github.com/philippecarle/moood/api
+WORKDIR /go/src/github.com/philippecarle/moood/api
+RUN go build -tags=jsoniter -o /go/bin/moood
 
 FROM scratch
-COPY --from=builder /go/bin/mood /go/bin/mood
+COPY --from=builder /go/bin/moood /go/bin/moood
