@@ -1,4 +1,6 @@
 FROM golang:1.14 AS base
+ARG BUILT_CMD
+ENV BUILT_CMD ${BUILT_CMD}
 
 FROM base AS dev
 RUN go get -u \
@@ -22,14 +24,17 @@ RUN go get -u \
     golang.org/x/lint/golint \
     golang.org/x/tools/gopls
 RUN go get -u github.com/cosmtrek/air
-CMD air
+CMD air -c .${BUILT_CMD}.air.conf
 
 FROM base AS builder
+ARG BUILT_CMD
 ENV GIN_MODE=release
 ENV PORT=80
-COPY . /go/src/github.com/philippecarle/moood/api
-WORKDIR /go/src/github.com/philippecarle/moood/api
-RUN go build -tags=jsoniter -o /go/bin/moood
+COPY . /go/src/github.com/philippecarle/moood/${BUILT_CMD}
+WORKDIR /go/src/github.com/philippecarle/moood/${BUILT_CMD}
+RUN go build -tags=jsoniter -o /go/bin/${BUILT_CMD}
 
 FROM scratch
-COPY --from=builder /go/bin/moood /go/bin/moood
+ARG BUILT_CMD
+ENV BUILT_CMD ${BUILT_CMD}
+COPY --from=builder /go/bin/${BUILT_CMD} /go/bin/${BUILT_CMD}
