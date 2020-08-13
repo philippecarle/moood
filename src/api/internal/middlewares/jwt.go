@@ -7,16 +7,17 @@ import (
 
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
-	"github.com/philippecarle/moood/api/internal/collection"
+	"github.com/philippecarle/moood/api/internal/database/collections"
 	"github.com/philippecarle/moood/api/internal/models"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var identityKey = "id"
+// IdentityKey is where the user is stored in the context
+const IdentityKey = "id"
 
 // JWTMiddleWareFactory is a struct with the user collection providing a way to build a GinJWTMiddleware
 type JWTMiddleWareFactory struct {
-	UsersCollection collection.UsersCollection
+	UsersCollection collections.UsersCollection
 }
 
 // NewJWTMiddleWare returns a GinJWTMiddleware
@@ -27,7 +28,7 @@ func (f *JWTMiddleWareFactory) NewJWTMiddleWare() *jwt.GinJWTMiddleware {
 		Key:             []byte(os.Getenv("JWT_PRIVATE_KEY")),
 		Timeout:         time.Hour,
 		MaxRefresh:      time.Hour * 24 * 30,
-		IdentityKey:     "user",
+		IdentityKey:     IdentityKey,
 		PayloadFunc:     f.buildClaims,
 		IdentityHandler: f.identify,
 		Authenticator:   f.authenticate,
@@ -45,9 +46,9 @@ func (f *JWTMiddleWareFactory) NewJWTMiddleWare() *jwt.GinJWTMiddleware {
 func (f *JWTMiddleWareFactory) buildClaims(data interface{}) jwt.MapClaims {
 	if u, ok := data.(models.User); ok {
 		return jwt.MapClaims{
-			identityKey: u.Username,
+			IdentityKey: u.Username,
 			"mercure": map[string][]string{
-				"subscribe": {"/users/" + u.ID.Hex()},
+				"subscribe": {"/users/" + u.Username},
 			},
 		}
 	}
@@ -56,7 +57,7 @@ func (f *JWTMiddleWareFactory) buildClaims(data interface{}) jwt.MapClaims {
 
 func (f *JWTMiddleWareFactory) identify(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
-	user, _ := f.UsersCollection.FindOneByUserName(claims[identityKey].(string))
+	user, _ := f.UsersCollection.FindOneByUserName(claims[IdentityKey].(string))
 	return user
 }
 

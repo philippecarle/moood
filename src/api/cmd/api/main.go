@@ -2,31 +2,22 @@ package main
 
 import (
 	"context"
-	"log"
-	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/philippecarle/moood/api/internal/bus"
-	"github.com/philippecarle/moood/api/internal/collection"
+	"github.com/philippecarle/moood/api/internal/database"
+	"github.com/philippecarle/moood/api/internal/database/collections"
 	"github.com/philippecarle/moood/api/internal/handlers"
 	"github.com/philippecarle/moood/api/internal/middlewares"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://mongo:27017").SetAuth(options.Credential{
-		Username: os.Getenv("MONGO_USERNAME"),
-		Password: os.Getenv("MONGO_PASSWORD"),
-	}))
-	if err != nil {
-		log.Fatal(err)
-	}
+	client := database.NewClient()
 
 	db := client.Database("mood")
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -35,8 +26,11 @@ func main() {
 
 	conn := bus.Connection{}
 	conn.Init()
-	uc := collection.NewUsersCollection(db)
-	e := handlers.NewEntriesHandler(&conn, collection.NewEntriesCollection(db))
+
+	uc := collections.NewUsersCollection(db)
+	ec := collections.NewEntriesCollection(db)
+
+	e := handlers.NewEntriesHandler(&conn, ec)
 	u := handlers.NewUserHandler(uc)
 	f := middlewares.JWTMiddleWareFactory{UsersCollection: uc}
 

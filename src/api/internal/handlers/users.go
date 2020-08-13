@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/philippecarle/moood/api/internal/collection"
+	"github.com/philippecarle/moood/api/internal/database/collections"
 	"github.com/philippecarle/moood/api/internal/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
@@ -13,11 +13,11 @@ import (
 
 // UsersHandler embeds users-related handler func
 type UsersHandler struct {
-	collection collection.UsersCollection
+	collection collections.UsersCollection
 }
 
 // NewUserHandler creates an users handler
-func NewUserHandler(u collection.UsersCollection) UsersHandler {
+func NewUserHandler(u collections.UsersCollection) UsersHandler {
 	return UsersHandler{collection: u}
 }
 

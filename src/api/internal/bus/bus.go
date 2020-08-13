@@ -24,7 +24,7 @@ func (c *Connection) Init() {
 	c.channel = ch
 }
 
-// Publish will open the amqp channel and publish a message describing the new Entry
+// Publish opens the amqp channel and publish a message describing the new Entry
 func (c *Connection) Write(j []byte) (int, error) {
 	err := c.channel.Publish(
 		"",
@@ -37,4 +37,23 @@ func (c *Connection) Write(j []byte) (int, error) {
 		})
 
 	return len(j), err
+}
+
+// Consume consumes the processed channel
+func (c *Connection) Consume() <-chan amqp.Delivery {
+	msgs, err := c.channel.Consume(
+		"processed",
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return msgs
 }

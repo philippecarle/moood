@@ -19,12 +19,13 @@ services:
       MONGO_USERNAME: root
       MONGO_PASSWORD: root
       JWT_PRIVATE_KEY: CH4NGEM3
+      GO111MODULE: "on"
 
-  sse:
+  consumer:
     build: 
       context: src/api
       args:
-        BUILT_CMD: sse
+        BUILT_CMD: consumer
       target: dev
     volumes: 
       - ./src/api/:/go/src/github.com/philippecarle/moood/api/
@@ -36,6 +37,7 @@ services:
       MONGO_USERNAME: root
       MONGO_PASSWORD: root
       JWT_PRIVATE_KEY: CH4NGEM3
+      GO111MODULE: "on"
 
   mongo:
     image: mongo
