@@ -11,9 +11,13 @@ def on_message(channel: pika.channel.Channel,
                body: bytes):
     nlp = spacy.load("en_core_web_sm")
     entry = json.loads(body.decode("utf-8"))
+    
     doc = nlp(entry['content'])
     sentences = [str(s) for s in doc.sents]
+
     analyzer = vaderSentiment.SentimentIntensityAnalyzer()
+    entry['score'] = analyzer.polarity_scores(entry['content'])
+
     entry['sentences'] = []
     for s in sentences:
         entry['sentences'].append({

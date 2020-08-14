@@ -7,24 +7,27 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/philippecarle/mood/api/internal/collection"
-	"github.com/philippecarle/mood/api/internal/models"
+	"github.com/philippecarle/moood/api/internal/database/collections"
+	"github.com/philippecarle/moood/api/internal/middlewares"
+	"github.com/philippecarle/moood/api/internal/models"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // EntriesHandler embeds entries-related handler func
 type EntriesHandler struct {
 	bus        io.Writer
-	repository collection.EntriesCollection
+	collection collections.EntriesCollection
 }
 
 // NewEntriesHandler creates an entries handler
-func NewEntriesHandler(b io.Writer, r collection.EntriesCollection) EntriesHandler {
-	return EntriesHandler{bus: b, repository: r}
+func NewEntriesHandler(b io.Writer, r collections.EntriesCollection) EntriesHandler {
+	return EntriesHandler{bus: b, collection: r}
 }
 
 // PostEntry is a gin handler func
 func (e *EntriesHandler) PostEntry(c *gin.Context) {
+	user := c.MustGet(middlewares.IdentityKey).(models.User)
+
 	var entry models.Entry
 	if err := c.ShouldBindJSON(&entry); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -32,8 +35,9 @@ func (e *EntriesHandler) PostEntry(c *gin.Context) {
 	}
 
 	entry.CreatedAt = primitive.NewDateTimeFromTime(time.Now())
+	entry.UserID = user.ID
 
-	if err := e.repository.Insert(&entry); err != nil {
+	if err := e.collection.Insert(&entry); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -42,10 +46,12 @@ func (e *EntriesHandler) PostEntry(c *gin.Context) {
 	_, err := e.bus.Write(j)
 
 	if err != nil {
-		err := e.repository.Delete(entry)
+		err := e.collection.Delete(entry)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	entry.UserID = primitive.NilObjectID
 
 	c.JSON(http.StatusCreated, entry)
 }
