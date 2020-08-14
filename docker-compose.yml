@@ -20,6 +20,10 @@ services:
       MONGO_PASSWORD: root
       JWT_PRIVATE_KEY: CH4NGEM3
       GO111MODULE: "on"
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_URL: rabbitmq
+      RABBITMQ_PORT: "5672"
 
   consumer:
     build: 
@@ -40,6 +44,10 @@ services:
       GO111MODULE: "on"
       MERCURE_HUB_URL: http://mercure
       MERCURE_HUB_PORT: "3000"
+      RABBITMQ_USER: guest
+      RABBITMQ_PASSWORD: guest
+      RABBITMQ_URL: rabbitmq
+      RABBITMQ_PORT: "5672"
 
   mongo:
     image: mongo

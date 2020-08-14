@@ -7,6 +7,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/philippecarle/moood/api/internal/bus"
+	"github.com/philippecarle/moood/api/internal/config"
 	"github.com/philippecarle/moood/api/internal/database"
 	"github.com/philippecarle/moood/api/internal/database/collections"
 	"github.com/philippecarle/moood/api/internal/handlers"
@@ -14,18 +15,18 @@ import (
 )
 
 func main() {
+	conf := config.GetConfig()
+
 	r := gin.Default()
 	r.Use(cors.Default())
 
-	client := database.NewClient()
-
-	db := client.Database("mood")
+	client := database.NewClient(conf.Mongo.User, conf.Mongo.Password)
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	db.Client().Connect(ctx)
 	defer cancel()
+	db := client.Database("mood")
+	db.Client().Connect(ctx)
 
-	conn := bus.Connection{}
-	conn.Init()
+	conn := bus.GetConnection(conf.RabbitMQ.User, conf.RabbitMQ.Password, conf.RabbitMQ.URL, conf.RabbitMQ.Port)
 
 	uc := collections.NewUsersCollection(db)
 	ec := collections.NewEntriesCollection(db)
