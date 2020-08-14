@@ -48,7 +48,7 @@ func (f *JWTMiddleWareFactory) buildClaims(data interface{}) jwt.MapClaims {
 		return jwt.MapClaims{
 			IdentityKey: u.Username,
 			"mercure": map[string][]string{
-				"subscribe": {"/users/" + u.Username},
+				"subscribe": {"/users/" + u.ID.Hex()},
 			},
 		}
 	}
