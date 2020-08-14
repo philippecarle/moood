@@ -38,6 +38,8 @@ services:
       MONGO_PASSWORD: root
       JWT_PRIVATE_KEY: CH4NGEM3
       GO111MODULE: "on"
+      MERCURE_HUB_URL: http://mercure
+      MERCURE_HUB_PORT: "3000"
 
   mongo:
     image: mongo
