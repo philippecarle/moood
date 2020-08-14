@@ -34,13 +34,13 @@ func (er *UsersCollection) Insert(e *models.User) error {
 	return nil
 }
 
-// FindOneByUserName finds a User in the database by their username
-func (er *UsersCollection) FindOneByUserName(username string) (models.User, error) {
+// FindOneByEmail finds a User in the database by their email
+func (er *UsersCollection) FindOneByEmail(email string) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	var user models.User
 
-	err := er.collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	err := er.collection.FindOne(ctx, bson.M{"email": email}).Decode(&user)
 
 	return user, err
 }

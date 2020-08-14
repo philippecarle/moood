@@ -75,7 +75,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"content\": \"Fuck! This app sucks!\"\n}",
+							"raw": "{\n    \"content\": \"Yeah! This app is amazing! Very love, much write\"\n}\n",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -119,7 +119,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"c@rlephilip.pe\",\n    \"firstName\": \"Philippe\",\n    \"lastName\": \"Carle\",\n    \"password\": \"P@ssw0rd15chars\"\n}",
+							"raw": "{\n    \"email\": \"c@rlephilip.pe\",\n    \"firstName\": \"Philippe\",\n    \"lastName\": \"Carle\",\n    \"password\": \"P@ssw0rd15chars\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -157,7 +157,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"c@rlephilip.pe\",\n    \"password\": \"P@ssw0rd15chars\"\n}",
+							"raw": "{\n    \"email\": \"c@rlephilip.pe\",\n    \"password\": \"P@ssw0rd15chars\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -184,7 +184,7 @@
 							"script": {
 								"id": "33047bd0-73ad-4136-a861-313c1bc7e397",
 								"exec": [
-									""
+									"pm.environment.set('JWT', pm.response.json().token)"
 								],
 								"type": "text/javascript"
 							}
@@ -195,10 +195,16 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": [],
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{JWT}}",
+								"type": "text"
+							}
+						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"c@rlephilip.pe\",\n    \"password\": \"P@ssw0rd15chars\"\n}",
+							"raw": "",
 							"options": {
 								"raw": {
 									"language": "json"

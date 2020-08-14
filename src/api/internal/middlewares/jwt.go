@@ -46,7 +46,7 @@ func (f *JWTMiddleWareFactory) NewJWTMiddleWare() *jwt.GinJWTMiddleware {
 func (f *JWTMiddleWareFactory) buildClaims(data interface{}) jwt.MapClaims {
 	if u, ok := data.(models.User); ok {
 		return jwt.MapClaims{
-			IdentityKey: u.Username,
+			IdentityKey: u.Email,
 			"mercure": map[string][]string{
 				"subscribe": {"/users/" + u.ID.Hex()},
 			},
@@ -57,7 +57,7 @@ func (f *JWTMiddleWareFactory) buildClaims(data interface{}) jwt.MapClaims {
 
 func (f *JWTMiddleWareFactory) identify(c *gin.Context) interface{} {
 	claims := jwt.ExtractClaims(c)
-	user, _ := f.UsersCollection.FindOneByUserName(claims[IdentityKey].(string))
+	user, _ := f.UsersCollection.FindOneByEmail(claims[IdentityKey].(string))
 	return user
 }
 
@@ -67,7 +67,7 @@ func (f *JWTMiddleWareFactory) authenticate(c *gin.Context) (interface{}, error)
 		return "", jwt.ErrMissingLoginValues
 	}
 
-	user, err := f.UsersCollection.FindOneByUserName(creds.Username)
+	user, err := f.UsersCollection.FindOneByEmail(creds.Email)
 	if err != nil {
 		return nil, jwt.ErrFailedAuthentication
 	}

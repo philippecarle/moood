@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -30,7 +31,7 @@ func (u *UsersHandler) Register(c *gin.Context) {
 	}
 
 	storedUser := models.User{
-		Username:  user.Username,
+		Email:     user.Email,
 		FirstName: user.FirstName,
 		LastName:  user.LastName,
 	}
@@ -50,11 +51,7 @@ func (u *UsersHandler) Register(c *gin.Context) {
 		return
 	}
 
-	createdUser, err := u.collection.FindOneByUserName(storedUser.Username)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+	log.Println("coucou")
 
-	c.JSON(http.StatusCreated, createdUser)
+	c.JSON(http.StatusCreated, storedUser)
 }
