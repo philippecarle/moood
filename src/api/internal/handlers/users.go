@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"time"
 
@@ -50,8 +49,6 @@ func (u *UsersHandler) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-
-	log.Println("coucou")
 
 	c.JSON(http.StatusCreated, storedUser)
 }

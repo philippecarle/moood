@@ -12,7 +12,7 @@ import (
 )
 
 // ConsumeProcessedEntries reads entries from the processed channel and update the database
-func ConsumeProcessedEntries(msgs <-chan amqp.Delivery, ec collections.EntriesCollection) {
+func ConsumeProcessedEntries(msgs <-chan amqp.Delivery, ec collections.EntriesCollection, client mercure.Client) {
 	tokenString := security.GenerateConsumerToken()
 
 	for d := range msgs {
@@ -39,7 +39,7 @@ func ConsumeProcessedEntries(msgs <-chan amqp.Delivery, ec collections.EntriesCo
 			continue
 		}
 
-		if err := mercure.PublishEntryUpdate(fullEntry, tokenString); err != nil {
+		if err := client.PublishEntryUpdate(fullEntry, tokenString); err != nil {
 			log.Fatalf("Could not create request to Mercure Hub, reason: %s", err.Error())
 		}
 	}

@@ -1,6 +1,8 @@
 package bus
 
 import (
+	"fmt"
+
 	"github.com/streadway/amqp"
 )
 
@@ -9,9 +11,9 @@ type Connection struct {
 	channel *amqp.Channel
 }
 
-// Init opens the connection and the Channel
-func (c *Connection) Init() {
-	conn, err := amqp.Dial("amqp://guest:guest@rabbitmq:5672/")
+// GetConnection returns an amqp connection
+func GetConnection(u string, pw string, url string, port int) Connection {
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%d/", u, pw, url, port))
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +23,7 @@ func (c *Connection) Init() {
 		panic(err)
 	}
 
-	c.channel = ch
+	return Connection{channel: ch}
 }
 
 // Publish opens the amqp channel and publish a message describing the new Entry

@@ -5,20 +5,29 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 
 	"github.com/philippecarle/moood/api/internal/models"
 )
 
+// Client is a struct in charge of the http interaction with the Mercure Hub
+type Client struct {
+	baseURL string
+}
+
+// NewClient returns a new Mercure Client
+func NewClient(url string, port int) Client {
+	return Client{baseURL: fmt.Sprintf("%s:%d%s", url, port, "/.well-known/mercure")}
+}
+
 // PublishEntryUpdate publishes an entry update to the mercure hub
-func PublishEntryUpdate(entry models.FullEntry, tokenString string) error {
+func (c *Client) PublishEntryUpdate(entry models.FullEntry, tokenString string) error {
 	data, _ := json.Marshal(entry)
 	form := url.Values{}
 	form.Add("topic", "/users/"+entry.UserID.Hex())
 	form.Add("data", string(data))
-	url := fmt.Sprintf("%s:%s%s", os.Getenv("MERCURE_HUB_URL"), os.Getenv("MERCURE_HUB_POST"), "/.well-known/mercure")
-	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(form.Encode()))
+
+	req, err := http.NewRequest(http.MethodPost, c.baseURL, strings.NewReader(form.Encode()))
 	if err != nil {
 		return err
 	}
